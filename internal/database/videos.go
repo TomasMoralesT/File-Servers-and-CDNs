@@ -3,6 +3,8 @@ package database
 import (
 	"database/sql"
 	"errors"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -60,6 +62,12 @@ func (c Client) GetVideos(userID uuid.UUID) ([]Video, error) {
 		); err != nil {
 			return nil, err
 		}
+
+		if video.ThumbnailURL != nil && *video.ThumbnailURL != "" && !strings.HasPrefix(*video.ThumbnailURL, "http") {
+			absoluteURL := fmt.Sprintf("http://localhost:8091%s", *video.ThumbnailURL)
+			video.ThumbnailURL = &absoluteURL
+		}
+
 		videos = append(videos, video)
 	}
 
