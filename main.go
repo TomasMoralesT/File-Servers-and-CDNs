@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -88,6 +89,11 @@ func main() {
 
 	NwCfig := s3.NewFromConfig(cfig)
 
+	if NwCfig == nil {
+		log.Fatal("Failed to create S3 client")
+	}
+	log.Printf("S3 client initialized successfully with region: %s and bucket: %s", s3Region, s3Bucket)
+
 	cfg := apiConfig{
 		db:               db,
 		jwtSecret:        jwtSecret,
@@ -99,6 +105,13 @@ func main() {
 		s3CfDistribution: s3CfDistribution,
 		port:             port,
 		s3Client:         NwCfig,
+	}
+
+	testURL, err := generatePresignedURL(cfg.s3Client, s3Bucket, "test.mp4", 15*time.Minute)
+	if err != nil {
+		log.Printf("Warning: Failed to generate test presigned URL: %v", err)
+	} else {
+		log.Printf("Test presigned URL generation successful: %s", testURL)
 	}
 
 	err = cfg.ensureAssetsDir()
