@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -105,13 +104,6 @@ func main() {
 		s3CfDistribution: s3CfDistribution,
 		port:             port,
 		s3Client:         NwCfig,
-	}
-
-	testURL, err := generatePresignedURL(cfg.s3Client, s3Bucket, "test.mp4", 15*time.Minute)
-	if err != nil {
-		log.Printf("Warning: Failed to generate test presigned URL: %v", err)
-	} else {
-		log.Printf("Test presigned URL generation successful: %s", testURL)
 	}
 
 	err = cfg.ensureAssetsDir()
